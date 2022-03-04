@@ -9,3 +9,7 @@ Install NPM packages
 npm install
 Enter your API in config.js
 const API_KEY = 'ENTER YOUR API';
+
+DISMARK
+
+This project is for testing purpose only, not for real trade usage
