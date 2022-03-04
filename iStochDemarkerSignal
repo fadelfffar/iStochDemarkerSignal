@@ -1,0 +1,120 @@
+//+------------------------------------------------------------------+
+//|                                         iStochDemarkerSignal.mq4 |
+//|                        Copyright 2020, MetaQuotes Software Corp. |
+//|                                             https://www.mql5.com |
+//+------------------------------------------------------------------+
+#property copyright "Copyright 2020, MetaQuotes Software Corp."
+#property link      "https://www.mql5.com"
+#property version   "1.00"
+#property strict
+//+------------------------------------------------------------------+
+//| Expert initialization function                                   |
+//+------------------------------------------------------------------+
+
+//global
+double MyPoint=Point;
+double Main_0;
+double Main_1;
+double Signal_0;
+double Signal_1;
+double SlowMA1;
+double FastMA1;
+double SlowMA2;
+double FastMA2;
+double _mySlowMA;
+double _myFastMA;
+double _mySTC;
+double _myBBand;
+double _myMA;
+double _myDeM;
+
+// usual input (Program E  A with Stochastic and 2 MA
+input int   InpUpper    = 80;
+input int   InpLower    = 20;
+
+input int   InpKPeriod    = 13;
+input int   InpDPeriod    = 9;
+input int   InpSlowing     = 5;
+input ENUM_MA_METHOD   InpStoMethod    = MODE_SMA;
+input ENUM_MA_METHOD   InpMAMethod    = MODE_SMA;
+input int   InpStoPrice    = 0;
+
+input int   InpFastPeriod    = 2;
+input int   InpSlowPeriod    = 3;
+
+//input
+
+extern double _DeviationBB = 0.610;
+extern int _Slowing_PeriodSTC =5;
+extern int InpKPeriodSTC = 13;
+extern int InpDPeriodSTC = 9;
+extern ENUM_MA_METHOD _STCMethod = MODE_SMA;
+extern ENUM_STO_PRICE _PriceSTC = 0; // Low o High
+
+int OnInit()
+  {
+//---
+   
+//---
+   return(INIT_SUCCEEDED);
+  }
+//+------------------------------------------------------------------+
+//| Expert deinitialization function                                 |
+//+------------------------------------------------------------------+
+void OnDeinit(const int reason)
+  {
+//---
+   
+  }
+//+------------------------------------------------------------------+
+//| Expert tick function                                             |
+//+------------------------------------------------------------------+
+void OnTick()
+  {
+//---
+if(Digits==3 || Digits==5) MyPoint=Point*10;
+  
+if(!NewBar()) return;
+// put Loading and Calc in a subroutine for easier management
+   FillBuffer();
+   
+     if (Main_0< 20  && Signal_0< 20 && Main_1 < 20  && Signal_1 < 20 )   {
+        
+      Comment("BUY order");
+   }
+   
+     if (Main_0>80  && Signal_0> 80 && Main_1 > 80  && Signal_1 > 80  ) {
+       
+      Comment("Sell order");
+      
+   }
+
+
+   
+  }
+  
+  
+void FillBuffer(){
+      Main_0  = iStochastic(Symbol(),PERIOD_M15,InpKPeriodSTC,
+      InpDPeriodSTC,InpSlowing,_STCMethod, _PriceSTC,MODE_MAIN,1);
+      Main_1  = iStochastic(Symbol(),PERIOD_H1,InpKPeriodSTC,
+      InpDPeriodSTC,InpSlowing,_STCMethod, _PriceSTC,MODE_MAIN,1);
+      Signal_0  = iStochastic(Symbol(),PERIOD_M15,InpKPeriodSTC,
+      InpDPeriodSTC,InpSlowing,_STCMethod, _PriceSTC,MODE_SIGNAL,1);
+      Signal_1  = iStochastic(Symbol(),PERIOD_H1,InpKPeriodSTC,
+      InpDPeriodSTC,InpSlowing,_STCMethod, _PriceSTC,MODE_SIGNAL,1);   
+   
+  }
+  
+bool NewBar() {
+     static datetime prevaTime = 0;
+     datetime currentTime = iTime(Symbol(), Period(), 0);
+     if(currentTime!= prevaTime) {
+         prevaTime = currentTime;
+         return(true);
+       }
+      return(false);
+ }
+
+//+------------------------------------------------------------------+
+
